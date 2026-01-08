@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoodVibe</title>
+    <link rel="icon" type="image/png" href="/static/icons/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Premium Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">
+                    <div class="sidebar-logo"></div>GoodVibe
+                </h1>
+                <button id="sidebar-toggle" title="Collapse Sidebar">
+                    <img src="/static/icons/chevron-left.svg" class="toggle-icon" alt="Toggle"
+                        style="width:18px; height:18px;">
+                </button>
+            </div>
+            <nav id="nav-menu">
+                <a href="#" data-route="dashboard" class="nav-link active"><img src="/static/icons/dashboard.svg"
+                        class="nav-icon" alt=""><span class="nav-text">Dashboard</span></a>
+                <a href="#" data-route="pos" class="nav-link"><img src="/static/icons/pos.svg" class="nav-icon"
+                        alt=""><span class="nav-text">Point of Sale</span></a>
+                <a href="#" data-route="repairs" class="nav-link"><img src="/static/icons/repairs.svg" class="nav-icon"
+                        alt=""><span class="nav-text">Repairs</span></a>
+                <a href="#" data-route="inventory" class="nav-link"><img src="/static/icons/inventory.svg"
+                        class="nav-icon" alt=""><span class="nav-text">Inventory</span></a>
+                <a href="#" data-route="purchases" class="nav-link"><img src="/static/icons/purchases.svg"
+                        class="nav-icon" alt=""><span class="nav-text">Purchases</span></a>
+                <a href="#" data-route="settings" class="nav-link"><img src="/static/icons/settings.svg"
+                        class="nav-icon" alt=""><span class="nav-text">Settings</span></a>
+            </nav>
+        </aside>
+        <main id="main-content">
+            <header>
+                <h2 id="page-title">Dashboard</h2>
+                <div style="display:flex; align-items:center; gap:1rem;">
+                    <button id="theme-toggle" title="Toggle Night Mode"
+                        style="background:none; border:none; cursor:pointer; padding:0.5rem;">
+                        <img id="theme-icon" src="/static/icons/moon.svg" class="theme-toggle-icon" alt="Toggle theme"
+                            style="width:20px; height:20px; filter: brightness(0) saturate(100%) invert(76%) sepia(15%) saturate(811%) hue-rotate(155deg);">
+                    </button>
+                    <div class="user-menu" style="position:relative;">
+                        <button id="user-menu-btn"
+                            style="background:none; border:none; font-weight:bold; color:var(--text-primary); cursor:pointer; display:flex; align-items:center; gap:0.5rem;">
+                            <span id="user-name-display">Admin</span>
+                            <span style="font-size:0.8rem;">▼</span>
+                        </button>
+                        <div id="user-dropdown"
+                            style="display:none; position:absolute; right:0; top:100%; background:var(--bg-glass); backdrop-filter:blur(12px); border:1px solid var(--border-glass); border-radius:var(--radius); box-shadow:var(--shadow-glass); flex-direction:column; min-width:150px; z-index:100;">
+                            <a href="#" id="menu-add-user"
+                                style="padding:0.75rem 1rem; text-decoration:none; color:var(--text-primary); display:block; border-bottom:1px solid var(--border-glass);">Add
+                                User</a>
+                            <a href="#" id="menu-logout"
+                                style="padding:0.75rem 1rem; text-decoration:none; color:var(--danger); display:block;">Logout</a>
+                        </div>
+                    </div>
+
+                    <script>
+                        // Theme Logic
+                        const toggleBtn = document.getElementById('theme-toggle');
+                        const body = document.body;
+                        if (localStorage.getItem('theme') === 'dark') {
+                            body.classList.add('dark-mode');
+                            const icon = document.getElementById('theme-icon');
+                            if (icon) icon.src = '/static/icons/sun.svg';
+                        }
+                        if (toggleBtn) {
+                            toggleBtn.onclick = () => {
+                                body.classList.toggle('dark-mode');
+                                localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+                                const icon = document.getElementById('theme-icon');
+                                if (icon) icon.src = body.classList.contains('dark-mode') ? '/static/icons/sun.svg' : '/static/icons/moon.svg';
+                            }
+                        }
+
+                        // Sidebar Collapse Logic
+                        const sidebarToggle = document.getElementById('sidebar-toggle');
+                        const sidebar = document.getElementById('sidebar');
+                        if (localStorage.getItem('sidebar') === 'collapsed') {
+                            sidebar.classList.add('collapsed');
+                        }
+                        if (sidebarToggle && sidebar) {
+                            sidebarToggle.onclick = () => {
+                                sidebar.classList.toggle('collapsed');
+                                localStorage.setItem('sidebar', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+                            };
+                        }
+
+                        // Dropdown Logic (Inlined for reliability)
+                        const menuBtn = document.getElementById('user-menu-btn');
+                        const dropdown = document.getElementById('user-dropdown');
+                        if (menuBtn && dropdown) {
+                            menuBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                const isFlex = dropdown.style.display === 'flex';
+                                dropdown.style.display = isFlex ? 'none' : 'flex';
+                            };
+                            document.addEventListener('click', () => dropdown.style.display = 'none');
+                            dropdown.onclick = (e) => e.stopPropagation();
+
+                            // Menu Actions
+                            document.getElementById('menu-logout').onclick = async () => {
+                                await fetch('/api/logout', { method: 'POST' });
+                                window.location.href = '/login';
+                            };
+                            document.getElementById('menu-add-user').onclick = (e) => {
+                                e.preventDefault();
+                                dropdown.style.display = 'none';
+                                document.getElementById('modal-add-user').style.display = 'flex';
+                            };
+                        }
+                    </script>
+                </div>
+            </header>
+
+            <!-- Add User Modal -->
+            <div id="modal-add-user"
+                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; z-index:999;">
+                <div class="card" style="width:400px; max-width:90%;">
+                    <h3>Add New User</h3>
+                    <form id="form-add-user">
+                        <div style="margin-bottom:1rem;">
+                            <label>Username</label>
+                            <input type="text" name="username" required>
+                        </div>
+                        <div style="margin-bottom:1rem;">
+                            <label>Password</label>
+                            <input type="password" name="password" required>
+                        </div>
+                        <div style="margin-bottom:1rem;">
+                            <label>Role</label>
+                            <select name="role">
+                                <option value="technician">Technician</option>
+                                <option value="staff">Staff</option>
+                                <option value="manager">Manager</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div style="text-align:right; gap:0.5rem; display:flex; justify-content:flex-end;">
+                            <button type="button" class="btn" style="background:var(--text-secondary); color:white;"
+                                onclick="document.getElementById('modal-add-user').style.display='none'">Cancel</button>
+                            <button type="submit" class="btn">Create User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+                // Add User Form Handler
+                document.getElementById('form-add-user').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    const data = Object.fromEntries(formData.entries());
+                    try {
+                        const res = await fetch('/api/users', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+                        const result = await res.json();
+                        if (res.ok) {
+                            alert('User Created Successfully!');
+                            e.target.reset();
+                            document.getElementById('modal-add-user').style.display = 'none';
+                        } else {
+                            alert('Error: ' + result.detail);
+                        }
+                    } catch (err) {
+                        alert('Network Error');
+                    }
+                };
+            </script>
+
+            <div id="view-container">
+                <!-- Dynamic Content Loaded Here -->
+                <div class="card">
+                    <h3>Welcome to GoodVibe</h3>
+                    <p>Select a module from the sidebar to begin.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/static/js/app.js"></script>
+</body>
+
+</html>

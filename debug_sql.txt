@@ -1,0 +1,58 @@
+Query: who repaired job job-e23e95?
+SQL: SELECT technician FROM jobs WHERE job_no = 'job-e23e95';
+---
+Query: who repaired job job-e23e95?
+SQL: SELECT technician FROM jobs WHERE job_no = 'job-e23e95';
+---
+Query: Who repaired job JOB-E23E95?
+SQL: SELECT technician FROM jobs WHERE job_no = 'JOB-E23E95';
+---
+Query: summarize jobs
+SQL: SELECT status, COUNT(*) AS job_count, SUM(estimated_cost) AS total_estimated_cost FROM jobs GROUP BY status;
+---
+Query: ok explain in detail about jobs
+SQL: SELECT id, job_no, device_model, status, estimated_cost, technician FROM jobs;
+---
+Query: sales report
+SQL: SELECT id, total, date, customer_name FROM sales;
+---
+Query: why u not say in before question
+SQL: SELECT id, total, date, customer_name FROM sales WHERE date = date('now');
+---
+Query: explain indetail of sales made
+SQL: SELECT id, total, date, customer_name FROM sales;
+---
+Query: purchase summary
+SQL: SELECT SUM(total) AS total_sales, COUNT(*) AS total_purchases FROM sales;
+---
+Query: purchase an stock summary
+SQL: SELECT sku, name, stock_qty, price FROM products WHERE sku != 'SERVICE';
+---
+Query: purchase history?
+SQL: SELECT id, total, date, customer_name FROM sales ORDER BY date;
+---
+Query: "Who is our best customer?"
+SQL: SELECT customer_name, SUM(total) AS total_spent
+FROM sales
+GROUP BY customer_name
+ORDER BY total_spent DESC
+LIMIT 1;
+---
+Query: what is our biggest purchase of inventory
+SQL: SELECT id, sku, name, price, stock_qty, (price * stock_qty) AS total_value FROM products WHERE sku != 'SERVICE' ORDER BY total_value DESC LIMIT 1;
+---
+Query: How much did we spend on purchases?
+SQL: SELECT SUM(estimated_cost) FROM jobs WHERE 0;
+---
+Query: Who repaired job JOB-E23E95?
+SQL: SELECT technician FROM jobs WHERE job_no = 'JOB-E23E95';
+---
+Query: How much did we spend on purchases?
+SQL: SELECT SUM(total_amount) AS total_spent FROM purchases;
+---
+Query: Who repaired job JOB-E23E95?
+SQL: SELECT technician FROM jobs WHERE job_no = 'JOB-E23E95';
+---
+Query: which item is less in stock
+SQL: SELECT id, sku, name, stock_qty FROM products WHERE stock_qty < 50 AND sku != 'SERVICE';
+---

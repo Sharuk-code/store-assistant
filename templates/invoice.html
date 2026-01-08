@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice_no }}</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #333;
+            padding-bottom: 1rem;
+        }
+
+        .shop-details {
+            font-size: 0.9rem;
+            max-width: 60%;
+            /* Prevent overlapping */
+            line-height: 1.4;
+        }
+
+        .invoice-details {
+            text-align: right;
+            max-width: 40%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 0.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .totals {
+            text-align: right;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .btn-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="btn-print" onclick="window.print()"
+        style="margin-bottom:1rem; padding:0.5rem 1rem; cursor:pointer;">Print Invoice</button>
+
+    <div class="header">
+        <div class="shop-details">
+            <h1>{{ store_name }}</h1>
+            <p>{{ store_address }}</p>
+            <p>Phone: {{ store_phone }}</p>
+        </div>
+        <div class="invoice-details">
+            <h2>INVOICE</h2>
+            <p><strong>No:</strong> {{ invoice_no }}</p>
+            <p><strong>Date:</strong> {{ date }}</p>
+            <p><strong>Customer:</strong> {{ customer_name or 'Walk-in' }}</p>
+            <p><strong>Phone:</strong> {{ customer_phone or '-' }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th style="text-align:right;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>
+                    {{ item.product_name }}<br>
+                    <small style="color:#666;">SKU: {{ item.sku }}</small>
+                </td>
+                <td>{{ item.qty }}</td>
+                <td>₹{{ item.price }}</td>
+                <td style="text-align:right;">₹{{ item.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <p><strong>Subtotal:</strong> ₹{{ subtotal }}</p>
+        {% if discount > 0 %}
+        <p><strong>Discount:</strong> -₹{{ discount }}</p>
+        {% endif %}
+        <p><strong>Tax (0%):</strong> ₹{{ tax }}</p>
+        <h3 style="margin-top:0.5rem;">Grand Total: ₹{{ total }}</h3>
+        <p><small>Mode: {{ payment_mode }}</small></p>
+    </div>
+
+    <div class="footer">
+        <p>{{ invoice_footer }}</p>
+        <p>Goods once sold will not be taken back. warranty as per manufacturer terms.</p>
+    </div>
+</body>
+
+</html>
